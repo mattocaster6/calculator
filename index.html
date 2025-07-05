@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Calculator</title>
+</head>
+
+<body>
+
+    <div class="calculator">
+        <div class="row">
+            <input type="text" id="display">
+            <button class="clear">C</button>
+        </div>
+        <div class="row">
+            <button class="digit">1</button>
+            <button class="digit">2</button>
+            <button class="digit">3</button>
+            <button class="operator">/</button>
+        </div>
+        <div class="row">
+            <button class="digit">4</button>
+            <button class="digit">5</button>
+            <button class="digit">6</button>
+            <button class="operator">*</button>
+        </div>
+        <div class="row">
+            <button class="digit">7</button>
+            <button class="digit">8</button>
+            <button class="digit">9</button>
+            <button class="operator">-</button>
+        </div>
+        <div class="row">
+            <button class="digit">0</button>
+            <button class="digit">.</button>
+            <button class="equals">=</button>
+            <button class="operator">+</button>
+        </div>
+    </div>
+    <script>
+        function add(a, b) {
+            return a + b;
+        }
+
+        function subtract(a, b) {
+            return a - b;
+        }
+
+        function multiply(a, b) {
+            return a * b;
+        }
+
+        function divide(a, b) {
+            return a / b;
+        }
+
+        function operate(a, b, op) {
+
+            switch (op) {
+                case "+":
+                    return add(a, b);
+                    break;
+                case "-":
+                    return subtract(a, b);
+                    break;
+                case "*":
+                    return multiply(a, b);
+                    break;
+                case "/":
+                    return divide(a, b);
+                    break;
+            }
+        }
+
+        const displayElement = document.querySelector("#display");
+        const calculator = document.querySelector(".calculator");
+
+        function populateDisplay(char) {
+            displayElement.value += char;
+        }
+
+        function clearDisplay() {
+            displayElement.value = "";
+        }
+
+        let num1 = null;
+        let num2 = null;
+        let op = "";
+        let currentNum = "";
+        let result = false;
+
+        calculator.addEventListener("click", (e) => {
+
+            const target = e.target;
+            const targetClassList = e.target.classList;
+
+            if (targetClassList.contains("digit")) {
+
+                if (result) {
+                    clearDisplay();
+                    result = false;
+                }
+                currentNum += target.textContent;
+                populateDisplay(target.textContent);
+
+            } else if (targetClassList.contains("operator")) {
+                result = false;
+
+                if(num1 && !currentNum) {
+                    op = target.textContent;
+                    displayElement.value = num1.toFixed(5) + op;
+                    return;
+                }
+
+                if (!op && (currentNum || num1)) {
+                    num1 = currentNum ? Number(currentNum) : num1;
+                    op = target.textContent;
+                    currentNum = "";
+                    populateDisplay(op);
+                } else if (op && num1 && currentNum) {
+
+                    if (!(currentNum === "0" && op === "/")) {
+
+                        num2 = Number(currentNum);
+                        num1 = operate(num1, num2, op);
+                        num2 = null;
+                        currentNum = "";
+                        op = target.textContent;
+
+                        displayElement.value = num1.toFixed(5) + op;
+                    } else {
+                        alert("You can't divide by zero idiot!");
+                    }
+
+                }
+
+            } else if (targetClassList.contains("equals")) {
+
+                if (num1 && op && currentNum) {
+
+                    if (!(currentNum === "0" && op === "/")) {
+                        num2 = Number(currentNum);
+                        num1 = operate(num1, num2, op);
+                        num2 = null;
+                        op = "";
+                        currentNum = "";
+
+                        displayElement.value = num1.toFixed(5);
+
+                        result = true;
+                    } else {
+                        alert("You can't divide by zero idiot!");
+                    }
+
+                }
+            } else if (targetClassList.contains("clear")) {
+                num1 = null;
+                num2 = null;
+                op = "";
+                currentNum = "";
+                clearDisplay();
+                result = false;
+            };
+
+            console.log(`num1: ${num1} num2: ${num2} op: ${op} currentNum: ${currentNum}`);
+        });
+
+    </script>
+</body>
+
+</html>
